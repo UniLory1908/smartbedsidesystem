@@ -21,12 +21,13 @@ class SmartBedsideSystem:
     def __init__(self):
         GPIO.setmode(GPIO.BOARD)  # Refer to the GPIO pins by their physical number on the board.
         GPIO.setwarnings(False)  # Disable warnings.
+        GPIO.setup(self.BUZZER_PIN, GPIO.OUT)
 
         self.spo2_hr_sensor = DFRobot_BloodOxygen_S()
         self.spo2_hr_sensor.begin()
         self.spo2_hr_sensor.sensor_start_collect()
 
-        self.alarm_on = None  # Replace None by initializing the alarm status (see User Story #2).
+        self.alarm_on = False  # Replace None by initializing the alarm status (see User Story #2).
 
         self.o2_servo = None  # Replace None by initializing the servo motor's PWM instance (see User Story #4).
         self.o2_valve_angle = None  # Replace None by initializing the valve angle, in degrees (see User Story #4).
@@ -52,6 +53,15 @@ class SmartBedsideSystem:
         Raises: SmartBedsideError: If the SpO₂ reading is invalid (propagated from read_vital_signs()).
         """
         # See User Story #2.
+
+        spo2 = self.read_vital_signs()
+
+        if spo2 < 88:
+            GPIO.output(self.BUZZER_PIN, True)
+            self.alarm_on = True
+        else:
+            GPIO.output(self.BUZZER_PIN, False)
+            self.alarm_on = False
 
     def stop_alarm(self) -> None:
         """
