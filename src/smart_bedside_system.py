@@ -22,6 +22,7 @@ class SmartBedsideSystem:
         GPIO.setmode(GPIO.BOARD)  # Refer to the GPIO pins by their physical number on the board.
         GPIO.setwarnings(False)  # Disable warnings.
         GPIO.setup(self.BUZZER_PIN, GPIO.OUT)
+        GPIO.setup(self.BUTTON_PIN, GPIO.IN)
 
         self.spo2_hr_sensor = DFRobot_BloodOxygen_S()
         self.spo2_hr_sensor.begin()
@@ -68,6 +69,12 @@ class SmartBedsideSystem:
         Stop the alarm if the pushbutton is pressed. Otherwise, leave the alarm unchanged.
         """
         # See User Story #3.
+
+        button_pressed = GPIO.input(self.BUTTON_PIN)
+
+        if button_pressed:
+            GPIO.output(self.BUZZER_PIN, False)
+            self.alarm_on = False
 
     def set_o2_valve_angle(self, angle: float) -> None:
         """
