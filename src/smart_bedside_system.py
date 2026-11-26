@@ -110,15 +110,18 @@ class SmartBedsideSystem:
         """
         Automatically regulate the oxygen delivery valve based on the
         patient's blood oxygen saturation (SpO₂).
-        If SpO₂ is below 95%, fully open the oxygen delivery valve.
-        Otherwise, fully close the oxygen delivery valve.
-        Raises: SmartBedsideError: If the SpO₂ reading is invalid (propagated from read_vital_signs()).
+        Fully open the valve below 90%, half open it at 90% or above but below
+        95%, and close it at 95% or above.
+        Raises: SmartBedsideError: If either vital sign reading is invalid.
         """
-        # See User Story #5.
+        # See User Story #10.
 
-        spo2 = self.read_vital_signs()
-
-        if spo2 < 95:
+        vitals = self.read_vital_signs()
+        spo2 = vitals[0]
+        
+        if spo2 < 90:
             self.set_o2_valve_angle(180.0)
+        elif spo2 < 95:
+            self.set_o2_valve_angle(90.0)
         else:
             self.set_o2_valve_angle(0.0)
