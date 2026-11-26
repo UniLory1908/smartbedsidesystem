@@ -60,14 +60,18 @@ class SmartBedsideSystem:
         """
         # See User Story #2.
 
-        spo2 = self.read_vital_signs()
+        vitals = self.read_vital_signs()
+        spo2 = vitals[0]
+        heart_rate = vitals[1]
 
-        if spo2 < 88:
+        if spo2 < 88 or heart_rate < 50 or heart_rate > 130:
             GPIO.output(self.BUZZER_PIN, True)
             self.alarm_on = True
-        else:
+        elif spo2 >= 88 and 50 <= heart_rate <= 130:
             GPIO.output(self.BUZZER_PIN, False)
             self.alarm_on = False
+        else:
+            raise SmartBedsideError()
 
     def stop_alarm(self) -> None:
         """
